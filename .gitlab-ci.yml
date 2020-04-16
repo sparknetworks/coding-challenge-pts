@@ -1,0 +1,67 @@
+variables:
+  GIT_DEPTH: "0"
+
+.tag_defaults: &tag_defaults
+  tags:
+    - docker
+
+.deploy_defaults: &deploy_defaults
+  image: registry.affinitas.io/k8/ci/k8-deploy-eks:latest
+  variables:
+    LOVEOS_NAMESPACE: interview
+    LOVEOS_APPLICATION: coding-challenge-pts
+  script:
+    - deployment
+  only:
+    - master
+  <<: *tag_defaults
+
+.java_image: &java_image
+  image: registry.affinitas.io/azul/zulu-openjdk-alpine:11.0.5-jre
+
+stages:
+  - analyze
+  - build_jar
+  - build_docker
+  - deploy
+
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+cache:
+  paths:
+    - .gradle/caches
+    - .gradle/wrapper
+
+# Analyze
+check:
+  image: adoptopenjdk/openjdk11
+  stage: analyze
+  script:
+    - ./gradlew check -x test
+  <<: *tag_defaults
+
+build_jar:
+  <<: *java_image
+  stage: build_jar
+  script:
+    - ./gradlew build -x test -x check
+  artifacts:
+    paths:
+      - build/libs/coding-challenge-pts-0.0.1-SNAPSHOT.jar
+    expire_in: 1 day
+  <<: *tag_defaults
+
+build_docker:
+  image: registry.affinitas.io/ci/docker-build-and-push
+  stage: build_docker
+  script:
+    - docker-build-and-push registry.affinitas.io/interview/$CI_PROJECT_NAME $CI_PIPELINE_ID
+  <<: *tag_defaults
+
+deploy:
+  <<: *deploy_defaults
+  stage: deploy
+  environment:
+    name: eks-shared-services-staging
+

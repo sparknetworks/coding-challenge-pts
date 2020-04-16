@@ -1,0 +1,49 @@
+[
+  {
+    "key": "UNAME",
+    "required": true,
+    "type": "TEXT_SINGLE",
+    "hintKey": "UNAME_HINT",
+    "constraints": {
+      "min": 2,
+      "max": 40
+    }
+  },
+  {
+    "key": "HEIGHT",
+    "required": true,
+    "type": "HEIGHT",
+    "constraints": {
+      "default": 180,
+      "min": 120,
+      "max": 229
+    }
+  },
+  {
+    "key": "HOBBIES",
+    "required": true,
+    "constraints": {
+      "min": 1,
+      "max": 3
+    },
+    "type": "CHOICE_BOXES",
+    "answers": [
+      "PAINTING",
+      "ACTING",
+      "AMATEUR_RADIO",
+      "RUNNING",
+      "READING"
+    ]
+  },
+  {
+    "key": "WHAT_FOOD_WOULD_BE_YOUR_FAVORITE",
+    "required": true,
+    "type": "PICTURE_TYPE",
+    "answers": [
+      "BURGER",
+      "PASTA",
+      "SUSHI",
+      "SALAD"
+    ]
+  }
+]
